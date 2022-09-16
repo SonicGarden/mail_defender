@@ -6,45 +6,42 @@ require 'action_mailer'
 require_relative 'mail_defender/version'
 
 class MailDefender
-  attr_accessor :deliver_emails_to, :forward_emails_to, :recipients
+  attr_accessor :deliver_emails_to, :forward_emails_to
 
   def initialize(options = {})
     @deliver_emails_to = Array.wrap(options[:deliver_emails_to])
     @forward_emails_to = Array.wrap(options[:forward_emails_to])
-    @recipients = []
   end
 
   def delivering_email(message)
-    @recipients = Array.wrap(message.to)
-    to_emails_list = normalize_recipients
-
-    message.perform_deliveries = to_emails_list.present?
-    message.to  = to_emails_list
+    message.to = normalize_recipients(message, :to)
+    message.cc = normalize_recipients(message, :cc)
+    message.bcc = normalize_recipients(message, :bcc)
   end
 
   private
 
-  def normalize_recipients
-    normalized_recipients = filter_by_deliver_emails_to
-    forward_recipients = forward_recipients_by_normalized_recipients(normalized_recipients)
+  def normalize_recipients(message, field)
+    recipients = Array.wrap(message.public_send(field))
+    allowed_recipients, denyed_recipients = filter_recipients(recipients)
+    forward_recipients = forward_recipients_by_denyed_recipients(denyed_recipients, field)
 
-    [normalized_recipients, forward_recipients].flatten.uniq.reject(&:blank?)
+    [allowed_recipients, forward_recipients].flatten.uniq.reject(&:blank?)
   end
 
-  def filter_by_deliver_emails_to
-    return [] if deliver_emails_to.empty?
+  def filter_recipients(recipients)
+    return [[], []] if deliver_emails_to.empty?
 
-    recipients.select do |recipient|
+    recipients.partition do |recipient|
       deliver_emails_to.any? { |deliver_email| deliver_email === recipient }
     end
   end
 
-  def forward_recipients_by_normalized_recipients(normalized_recipients)
-    intercepted_recipients = recipients - normalized_recipients
-    return [] if intercepted_recipients.empty?
+  def forward_recipients_by_denyed_recipients(denyed_recipients, field)
+    return [] if denyed_recipients.empty?
 
     forward_emails_to.map do |email|
-      ActionMailer::Base.email_address_with_name(email, "Orig to: #{intercepted_recipients.join(',').truncate(100)}")
+      ActionMailer::Base.email_address_with_name(email, "Orig #{field}: #{denyed_recipients.join(',').truncate(100)}")
     end
   end
 end
