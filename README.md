@@ -13,11 +13,12 @@ gem 'mail_defender', group: [:development, :staging]
 ```rb
 # config/initializers/mail_defender.rb
 if Rails.env.development? || Rails.env.staging?
-  interceptor = MailDefender.new({
-    forward_emails_to: 'intercepted_emails@domain.com',
-    deliver_emails_to: [/@wheel\.com$/, 'tester@allowed.test']
-  })
-  ActionMailer::Base.register_interceptor(interceptor)
+  ActiveSupport.on_load(:action_mailer) do
+    register_interceptor(MailDefender.new({
+      forward_emails_to: 'intercepted_emails@domain.com',
+      deliver_emails_to: [/@wheel\.com$/, 'tester@allowed.test']
+    }))
+  end
 end
 ```
 
