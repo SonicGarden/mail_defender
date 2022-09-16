@@ -6,11 +6,11 @@ require 'action_mailer'
 require_relative 'mail_defender/version'
 
 class MailDefender
-  attr_accessor :deliver_emails_to, :forward_emails_to
+  attr_reader :deliver_emails_to, :forward_emails_to
 
-  def initialize(options = {})
-    @deliver_emails_to = Array.wrap(options[:deliver_emails_to])
-    @forward_emails_to = Array.wrap(options[:forward_emails_to])
+  def initialize(deliver_emails_to: [], forward_emails_to: [])
+    @deliver_emails_to = Array.wrap(deliver_emails_to)
+    @forward_emails_to = Array.wrap(forward_emails_to)
   end
 
   def delivering_email(message)
