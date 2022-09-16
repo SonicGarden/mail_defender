@@ -8,7 +8,7 @@ RSpec.describe MailDefender do
   describe '#delivering_email' do
     context 'deliver_emails_to is a array of strings' do
       it 'Only different addresses are forwarded' do
-        interceptor = MailDefender::Interceptor.new(forward_emails_to: 'test@example.com', deliver_emails_to: ['a@wheel.com', 'd@club.com', 'john@gmail.com'])
+        interceptor = MailDefender.new(forward_emails_to: 'test@example.com', deliver_emails_to: ['a@wheel.com', 'd@club.com', 'john@gmail.com'])
         message.to = [
           'a@wheel.com', 'b@wheel.com', 'c@pump.com', 'd@club.com', 'e@gmail.com', 'john@gmail.com', 'sam@gmail.com'
         ]
@@ -19,7 +19,7 @@ RSpec.describe MailDefender do
 
     context 'deliver_emails_to is a array of strings and regexp' do
       it 'Unmatched addresses are forwarded' do
-        interceptor = MailDefender::Interceptor.new(forward_emails_to: 'test@example.com', deliver_emails_to: [/@wheel\.com$/, /@pump\.com$/, 'john@gmail.com'])
+        interceptor = MailDefender.new(forward_emails_to: 'test@example.com', deliver_emails_to: [/@wheel\.com$/, /@pump\.com$/, 'john@gmail.com'])
         message.to = [
           'a@wheel.com', 'b@wheel.com', 'c@pump.com', 'd@club.com', 'e@gmail.com', 'john@gmail.com', 'sam@gmail.com'
         ]
@@ -30,7 +30,7 @@ RSpec.describe MailDefender do
 
     context 'forward_emails_to is a empty' do
       it 'Sent only to matched addresses' do
-        interceptor = MailDefender::Interceptor.new(deliver_emails_to: [/@wheel\.com$/, /@pump\.com$/, 'john@gmail.com'])
+        interceptor = MailDefender.new(deliver_emails_to: [/@wheel\.com$/, /@pump\.com$/, 'john@gmail.com'])
         message.to = [
           'a@wheel.com', 'b@wheel.com', 'c@pump.com', 'd@club.com', 'e@gmail.com', 'john@gmail.com', 'sam@gmail.com'
         ]

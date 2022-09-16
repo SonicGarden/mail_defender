@@ -14,7 +14,7 @@ gem 'mail_defender', group: [:development, :staging]
 
 ```rb
 if Rails.env.development? || Rails.env.staging?
-  interceptor = MailDefender::Interceptor.new({
+  interceptor = MailDefender.new({
     forward_emails_to: 'intercepted_emails@domain.com',
     deliver_emails_to: [/@wheel\.com$/, 'tester@allowed.test']
   })
