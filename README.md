@@ -10,9 +10,8 @@ However we need to test emails time to time.
 gem 'mail_defender', group: [:development, :staging]
 ```
 
-# config/initializers/mail_defender.rb
-
 ```rb
+# config/initializers/mail_defender.rb
 if Rails.env.development? || Rails.env.staging?
   interceptor = MailDefender.new({
     forward_emails_to: 'intercepted_emails@domain.com',
